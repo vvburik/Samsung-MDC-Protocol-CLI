@@ -5,8 +5,8 @@ from scapy.all import *
 from subprocess import Popen, PIPE
 import argparse
 import configparser
-import commands
 import os
+import commands
 from wol import wake_on_lan
 
 pwr_on = [commands.header, commands.power_command, commands.id_all, commands.data_lenght, commands.power_command_on]

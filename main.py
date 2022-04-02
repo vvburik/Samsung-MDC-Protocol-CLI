@@ -1,8 +1,12 @@
+from distutils.command.config import config
+from pickle import NONE
 import socket
 from scapy.all import *
 from subprocess import Popen, PIPE
 import argparse
+import configparser
 import commands
+import os
 from wol import wake_on_lan
 
 pwr_on = [commands.header, commands.power_command, commands.id_all, commands.data_lenght, commands.power_command_on]
@@ -16,6 +20,39 @@ parser.add_argument('-port', default=1515, help='Default Samsung MDC Port is 151
 parser.add_argument('-p', type=str, help='Power (On, Off), (-p on or -p off)')
 parser.add_argument('-i', type=str, help='Input option, DP or HDMI, (-i dp or -i hdmi)')
 parsed = parser.parse_args()
+
+def create_config_file (file):
+    config = configparser.ConfigParser()
+    config.add_section('Device')
+    config.set('Device', str(parsed.ip), str(getmacbyip(parsed.ip)))
+    #config.set('Device', 's-box', '0')
+    #config.set('Device', 'ip', str(parsed.ip))
+    #config.set('Device', 'mac', str(getmacbyip(parsed.ip)))
+    with open(file, 'w') as configfile:
+        config.write(configfile)
+
+def read_file (file):
+    if not os.path.exists(file):
+        create_config_file(file)
+    elif os.path.exists(file):
+        l = []
+        with open(file, 'r') as f:
+            for L in f:
+                l.append(L)
+            f.close()
+        if len(l) == 0:
+            config = configparser.ConfigParser()
+            #config.read(file)
+            config.add_section('Device')
+            config.set('Device', str(parsed.ip), str(getmacbyip(parsed.ip)))
+            with open(file, 'w') as configfile:
+                config.write(configfile)
+        elif len(l) != 0:
+            config = configparser.ConfigParser()
+            config.read(file)
+            config.set('Device', str(parsed.ip), str(getmacbyip(parsed.ip)))
+            with open(file, 'w') as configfile:
+                config.write(configfile)
 
 ########## checksum calculate:
 def checksum(command):
@@ -70,3 +107,6 @@ elif str(parsed.i).lower().strip() == 'hdmi':
     s.send(p_hdmi)
     s.close()
 
+if __name__ == "__main__":
+    file = "Devices.ini"
+    read_file(file)

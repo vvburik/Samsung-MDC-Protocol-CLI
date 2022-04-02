@@ -17,8 +17,6 @@ parser.add_argument('-p', type=str, help='Power (On, Off), (-p on or -p off)')
 parser.add_argument('-i', type=str, help='Input option, DP or HDMI, (-i dp or -i hdmi)')
 parsed = parser.parse_args()
 
-#ip = parsed.p
-
 ########## checksum calculate:
 def checksum(command):
     cmd = command[1:] #cut header
@@ -59,4 +57,16 @@ elif str(parsed.p).lower().strip() == 'off':
     s.send(p_off)
     s.close()
 
+if str(parsed.i).lower().strip() == 'dp':
+    p_dp = makecommand(switch_to_DP, checksum(switch_to_DP))
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect(parsed.ip, parsed.port)
+    s.send(p_dp)
+    s.close()
+elif str(parsed.i).lower().strip() == 'hdmi':
+    p_hdmi = makecommand(swittch_to_Hdmi, checksum(swittch_to_Hdmi))
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect(parsed.ip, parsed.port)
+    s.send(p_hdmi)
+    s.close()
 

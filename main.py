@@ -41,12 +41,7 @@ def read_file (file):
                 l.append(L)
             f.close()
         if len(l) == 0:
-            config = configparser.ConfigParser()
-            #config.read(file)
-            config.add_section('Device')
-            config.set('Device', str(parsed.ip), str(getmacbyip(parsed.ip)))
-            with open(file, 'w') as configfile:
-                config.write(configfile)
+            create_config_file(file)
         elif len(l) != 0:
             config = configparser.ConfigParser()
             config.read(file)
